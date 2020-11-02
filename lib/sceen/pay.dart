@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:dormitory/sceen/dormFee.dart';
+import 'package:dormitory/uinty/normalDialog.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Paydorm extends StatefulWidget {
   @override
@@ -8,6 +14,9 @@ class Paydorm extends StatefulWidget {
 }
 
 class _PaydormState extends State<Paydorm> {
+  var  url;
+  File _image;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,10 +122,13 @@ class _PaydormState extends State<Paydorm> {
           ),
           child: Stack(
             children: [
+              showImage(),
               scbImages(),
               kungImages(),
               idSCB(),
               idkongt(),
+              setImages(),
+              upImages()
             ],
           ),
         ),
@@ -124,22 +136,76 @@ class _PaydormState extends State<Paydorm> {
     );
   }
 
-  Widget idSCB() {
-    return Row(mainAxisAlignment: MainAxisAlignment.end,
+  Widget upImages() => Container(
+        margin: EdgeInsets.only(right: 75, bottom: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Container(margin: EdgeInsets.only(right: 50,top: 75),
-                  child: Text('123_456_789',style: TextStyle(fontSize: 20),),),
+                RaisedButton(
+                  color: Colors.white,
+                  onPressed: () {
+                    uploadFile();
+                  },
+                  child: Text('Update Image'),
+                ),
               ],
-            );
+            ),
+          ],
+        ),
+      );
+
+  Widget setImages() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            IconButton(
+              icon: Icon(Icons.add_photo_alternate),
+              iconSize: 65,
+              color: Color(0xFF1f4961),
+              onPressed: () {
+                chooseFile(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget idSCB() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          margin: EdgeInsets.only(right: 50, top: 75),
+          child: Text(
+            '123_456_789',
+            style: TextStyle(fontSize: 20),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget idkongt() {
-    return Row(mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(margin: EdgeInsets.only(right: 50,top: 200),
-                  child: Text('123_456_789',style: TextStyle(fontSize: 20),),),
-              ],
-            );
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          margin: EdgeInsets.only(right: 50, top: 200),
+          child: Text(
+            '123_456_789',
+            style: TextStyle(fontSize: 20),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget scbImages() {
@@ -206,6 +272,37 @@ class _PaydormState extends State<Paydorm> {
         border: Border.all(color: Colors.black, width: 3.0),
         borderRadius: BorderRadius.circular(16),
       ),
+    );
+  }
+
+  Future chooseFile(ImageSource source) async {
+    try {
+      var object = await ImagePicker.pickImage(
+          source: source, maxWidth: 800.0, maxHeight: 800.0);
+
+      setState(() {
+        _image = object;
+      });
+    } catch (e) {}
+  }
+
+  Future uploadFile() async {
+    print('----------------');
+    Random random = Random();
+    int i = random.nextInt(1000);
+    FirebaseStorage firebaseStorage = FirebaseStorage.instance;
+    StorageReference storageReference =
+        firebaseStorage.ref().child('test/$i.jpg');
+    StorageUploadTask storageUploadTask = storageReference.putFile(_image);
+
+  
+    print('==================$_image');
+  }
+  Widget showImage() {
+    return Container(
+      padding: EdgeInsets.all(20.0),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.width * 0.3,child: _image == null ? Text('') : Image.file(_image),
     );
   }
 }

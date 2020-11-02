@@ -16,11 +16,11 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   final database = FirebaseDatabase.instance.reference();
 
-  var idRoom, payE, payW, payR, payO, payT, moth;
+  var idRoom, payE, payW, payR, payO, payT, moth,id;
 
   @override
   void initState() {
-    database.child('Tenant').child(member).once().then((DataSnapshot showroom) {
+   database.child('Tenant').child(member).once().then((DataSnapshot showroom) {
       // print(showroom.value['IDRoom']);
       idRoom = showroom.value['IDRoom'];
       getData();
